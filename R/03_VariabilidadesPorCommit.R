@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 variabilidadesPorCommit <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -31,11 +31,11 @@ gerarVariabilidadesPorCommit <- function(projeto, valores) {
     group_by(Commit) %>%
     summarise(Variabilidades = n())
   
-  tabela <- paste("../graphs/", projeto, "/03_", projeto, "_VariabilitiesPerCommit.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/03_", projeto, "_VariabilitiesPerCommit.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/03_", projeto, "_VariabilitiesPerCommit.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/03_", projeto, "_VariabilitiesPerCommit.png", sep = "")
   
   png(file = imagem)
   

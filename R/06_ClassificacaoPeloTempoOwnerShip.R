@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 classificacaoPeloTempo <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -78,11 +78,11 @@ gerarClassificacaoPeloTempoOwnership <- function(projeto, valores) {
   df <- melt(arq_var, id.vars = "Data", variable.name = "Classificacao", measure.vars = c("Major", "Minor"))
   df <- arrange(df, Data)
   
-  tabela <- paste("../graphs/", projeto, "/06_", projeto, "_ClassificationOverTimeOwnership.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/06_", projeto, "_ClassificationOverTimeOwnership.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/06_", projeto, "_ClassificationOverTimeOwnerShip.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/06_", projeto, "_ClassificationOverTimeOwnerShip.png", sep = "")
   
   png(file = imagem)
   

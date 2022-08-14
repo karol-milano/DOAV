@@ -21,7 +21,7 @@ n_fun <- function(x) {
 #' @param projeto O nome do projeto que possui o arquivo de dados
 #' @return Os valores lidos da planilha "Autores" do arquivo
 lerPlanilhaAutores <- function(projeto) {
-  arquivo <- paste("../graphs/", projeto, "/", projeto, "_authors.csv", sep = "")
+  arquivo <- paste("../data/graphs/", projeto, "/", projeto, "_authors.csv", sep = "")
   
   print(paste("Lendo o arquivo", arquivo))
   valores <- read.csv(arquivo)
@@ -47,7 +47,7 @@ lerPlanilhaAutores <- function(projeto) {
 #' @param projeto O nome do projeto que possui o arquivo de dados
 #' @return Os valores lidos da planilha "Commits" do arquivo
 lerPlanilhaCommits <- function(projeto) {
-  arquivo <- paste("../graphs/", projeto, "/", projeto, "_commits.csv", sep = "")
+  arquivo <- paste("../data/graphs/", projeto, "/", projeto, "_commits.csv", sep = "")
   
   print(paste("Lendo arquivo", arquivo))
   valores <- read.csv(arquivo)
@@ -76,7 +76,7 @@ lerPlanilhaCommits <- function(projeto) {
 #' @param projeto O nome do projeto que possui o arquivo de dados
 #' @return Os valores lidos da planilha "Variabilidades" do arquivo
 lerPlanilhaVariabilidades <- function(projeto) {
-  arquivo <- paste("../graphs/", projeto, "/", projeto, "_variabilities.csv", sep = "")
+  arquivo <- paste("../data/graphs/", projeto, "/", projeto, "_variabilities.csv", sep = "")
   
   print(paste("Lendo o arquivo", arquivo))
   valores <- read.csv(arquivo)

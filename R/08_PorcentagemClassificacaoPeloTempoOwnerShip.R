@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 porcentagemClassificacaoPeloTempo <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -81,11 +81,11 @@ gerarPorcentagemClassificacaoPeloTempoOwnerShip <- function(projeto, valores) {
   df <- melt(arq_var, id.vars = "Data", variable.name = "Percentage", measure.vars = c("Perc_Major", "Perc_Minor"))
   df <- arrange(df, Data)
   
-  tabela <- paste("../graphs/", projeto, "/08_", projeto, "_PercentageClassificationOverTimeOwnership.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/08_", projeto, "_PercentageClassificationOverTimeOwnership.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/08_", projeto, "_PercentageClassificationOverTimeOwnership.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/08_", projeto, "_PercentageClassificationOverTimeOwnership.png", sep = "")
   
   png(file = imagem)
   

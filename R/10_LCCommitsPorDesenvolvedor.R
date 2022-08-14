@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 lcCommitsPorDesenvolvedor <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -34,11 +34,11 @@ gerarLCCommitsPorDesenvolvedor <- function(projeto, valores) {
   
   arq_var[ , "Total"] = sum(arq_var[ , "Commits"])
   
-  tabela <- paste("../graphs/", projeto, "/10_", projeto, "_LCCommitsByDeveloperOwnership.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/10_", projeto, "_LCCommitsByDeveloperOwnership.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/10_", projeto, "_LCCommitsByDeveloperOwnership.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/10_", projeto, "_LCCommitsByDeveloperOwnership.png", sep = "")
   
   png(file = imagem)
   

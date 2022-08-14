@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 desenvolvedoresPorVariabilidadePeloTempo <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -30,11 +30,11 @@ gerarDesenvolvedoresPorVariabilidadePeloTempo <- function(projeto, valores) {
     group_by(Variabilidades, Data) %>%
     summarise(Desenvolvedor = n())
   
-  tabela <- paste("../graphs/", projeto, "/12_", projeto, "_DevelopersByVariabilitiesOverTime.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/12_", projeto, "_DevelopersByVariabilitiesOverTime.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/12_", projeto, "_DevelopersByVariabilitiesOverTime.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/12_", projeto, "_DevelopersByVariabilitiesOverTime.png", sep = "")
   
   png(file = imagem)
   

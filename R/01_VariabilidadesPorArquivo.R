@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 variabilidadesPorArquivo <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaAutores(file.names[i])
@@ -31,11 +31,11 @@ gerarVariabilidadesPorArquivo <- function(projeto, valores) {
     group_by(Arquivo) %>%
     summarise(Variabilidades = n())
   
-  tabela <- paste("../graphs/", projeto, "/01_", projeto, "_VariabilitiesPerFile.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/01_", projeto, "_VariabilitiesPerFile.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/01_", projeto, "_VariabilitiesPerFile.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/01_", projeto, "_VariabilitiesPerFile.png", sep = "")
   
   png(file = imagem)
   

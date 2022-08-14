@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 classificacaoPeloTempo <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -86,11 +86,11 @@ gerarClassificacaoPeloTempo <- function(projeto, valores) {
   df <- melt(arq_var, id.vars = "Data", variable.name = "Classificacao", measure.vars = c("Specialist", "Generalist", "Mixed"))
   df <- arrange(df, Data)
 
-  tabela <- paste("../graphs/", projeto, "/05_", projeto, "_ClassificationOverTimeDOA.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/05_", projeto, "_ClassificationOverTimeDOA.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/05_", projeto, "_ClassificationOverTimeDOA.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/05_", projeto, "_ClassificationOverTimeDOA.png", sep = "")
   
   png(file = imagem)
   

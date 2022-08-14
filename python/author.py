@@ -49,7 +49,7 @@ def parse_author(json_data):
 			if auth == authorname:
 				fa = 1
 
-			abs_doa = Autor.doa_a(fa, dl, (ac - dl))
+			abs_doa = doa_a(fa, dl, (ac - dl))
 			
 			if abs_doa > max_doa:
 				max_doa = abs_doa

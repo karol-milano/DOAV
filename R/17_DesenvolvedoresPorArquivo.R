@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 desenvolvedoresPorArquivo <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaAutores(file.names[i])
@@ -25,11 +25,11 @@ gerarDesenvolvedoresPorArquivo <- function(projeto, valores) {
     group_by(Arquivo) %>%
     summarise(Desenvolvedor = n())
 
-  tabela <- paste("../graphs/", projeto, "/17_", projeto, "_DevelopersByFile.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/17_", projeto, "_DevelopersByFile.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/17_", projeto, "_DevelopersByFile.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/17_", projeto, "_DevelopersByFile.png", sep = "")
   
   png(file = imagem)
   

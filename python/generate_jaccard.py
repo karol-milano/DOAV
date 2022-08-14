@@ -22,7 +22,9 @@ while True:
     except OverflowError:
         maxInt = int(maxInt/10)
 
-work_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+working_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_dir = os.path.join(working_directory, "data")
 
 
 def jaccard_similarity(a, b):
@@ -31,7 +33,7 @@ def jaccard_similarity(a, b):
 
 
 def prepare_set():
-    in_file = os.path.join(work_dir, "test_dataset.csv")
+    in_file = os.path.join(data_dir, "test_dataset.csv")
 
     projetos = []
     revisores = []
@@ -63,17 +65,17 @@ def prepare_set():
                 "desenvolvedor": row["reviewer"]
             })
 
-        out_file = os.path.join(work_dir, "ownership_set.csv")
+        out_file = os.path.join(data_dir, "ownership_set.csv")
         with open(out_file, "w", encoding="utf-8") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames = ["projeto", "desenvolvedor"])
             writer.writeheader()
 
-        out_file = os.path.join(work_dir, "authorship_set.csv")
+        out_file = os.path.join(data_dir, "authorship_set.csv")
         with open(out_file, "w", encoding="utf-8") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames = ["projeto", "desenvolvedor"])
             writer.writeheader()
 
-        out_file = os.path.join(work_dir, "revisores_set.csv")
+        out_file = os.path.join(data_dir, "revisores_set.csv")
         with open(out_file, "w", encoding="utf-8") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames = ["projeto", "desenvolvedor"])
             writer.writeheader()
@@ -91,7 +93,7 @@ def prepare_set():
             ownership_dict[projeto] = ownership_set
 
             if len(ownership_set) > 0:
-                out_file = os.path.join(work_dir, "ownership_set.csv")
+                out_file = os.path.join(data_dir, "ownership_set.csv")
                 with open(out_file, "a", encoding="utf-8") as csv_file:
                     writer = csv.DictWriter(csv_file, fieldnames = ["projeto", "desenvolvedor"])
                     for x in ownership_set:
@@ -101,7 +103,7 @@ def prepare_set():
                         })
 
             if len(authorship_set) > 0:
-                out_file = os.path.join(work_dir, "authorship_set.csv")
+                out_file = os.path.join(data_dir, "authorship_set.csv")
                 with open(out_file, "a", encoding="utf-8") as csv_file:
                     writer = csv.DictWriter(csv_file, fieldnames = ["projeto", "desenvolvedor"])
                     for x in authorship_set:
@@ -111,7 +113,7 @@ def prepare_set():
                         })
 
             if len(revisores_set) > 0:
-                out_file = os.path.join(work_dir, "revisores_set.csv")
+                out_file = os.path.join(data_dir, "revisores_set.csv")
                 with open(out_file, "a", encoding="utf-8") as csv_file:
                     writer = csv.DictWriter(csv_file, fieldnames = ["projeto", "desenvolvedor"])
                     for x in revisores_set:
@@ -124,33 +126,31 @@ def prepare_set():
 
 
 def jaccard(corte, projetos, revisores_dict, authorship_dict, ownership_dict):
-    jac_dir = os.path.join(work_dir, "jaccard")
+    jac_dir = os.path.join(data_dir, "jaccard")
     corte_dir = os.path.join(jac_dir, "corte_" + str(corte))
 
     if not os.path.exists(corte_dir):
         os.makedirs(corte_dir)
 
-    files = [f for f in sorted(os.listdir(jac_dir)) if len(f.split(".")) == 2 and f.split(".")[1] == "csv"]
+    files = ["doav.csv"]
 
     for jac_file in files:
-        if not jac_file.startswith("formula"):
-            continue
-
-        input_file = os.path.join(jac_dir, jac_file)
+        
+        input_file = os.path.join(data_dir, jac_file)
         print(input_file)
 
         jac = []
         formula = []
         data = pd.read_csv(input_file)        
         for index, row in data.iterrows():
-            if float(row['formula_valor']) > corte:
+            if float(row['doav_n']) > corte:
                 formula.append({
                     "projeto": row["projeto"],
                     "desenvolvedor": row["desenvolvedor"]
                 })
 
         out_file = os.path.join(corte_dir, "devs_" + jac_file)
-        # out_file = os.path.join(work_dir, "jaccard_res.csv")
+        # out_file = os.path.join(data_dir, "jaccard_res.csv")
         with open(out_file, "w", encoding="utf-8") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames = ["projeto", "desenvolvedor"])
             writer.writeheader()
@@ -188,8 +188,7 @@ def jaccard(corte, projetos, revisores_dict, authorship_dict, ownership_dict):
                 "nota_corte": corte
             })
 
-        out_file = os.path.join(corte_dir, "jaccard_" + jac_file.split("formula_")[1])
-        # out_file = os.path.join(work_dir, "jaccard_res.csv")
+        out_file = os.path.join(corte_dir, "jaccard_res.csv")
         with open(out_file, "w", encoding="utf-8") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames = jac[0].keys())
             writer.writeheader()
@@ -197,9 +196,10 @@ def jaccard(corte, projetos, revisores_dict, authorship_dict, ownership_dict):
 
 
 if __name__ == "__main__":
-    cortes = [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5, 0.75]
+    cortes = [0.1, 0.15, 0.2, 0.25]
 
     projetos, revisores_dict, authorship_dict, ownership_dict = prepare_set()
     for corte in cortes:
-        print(corte)
+        print("corte", corte)
         jaccard(corte, projetos, revisores_dict, authorship_dict, ownership_dict)
+        print("="*100)

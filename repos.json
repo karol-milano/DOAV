@@ -2,7 +2,7 @@
     {"owner": "alliedmodders", "repo": "amxmodx", "clone": 1},
     {"owner": "angband", "repo": "angband", "clone": 1},
     {"owner": "asfadmin", "repo": "asf_mapready", "clone": 1},
-    {"owner": "akimd", "repo": "bison", "download": 0},
+    {"owner": "akimd", "repo": "bison", "clone": 1},
     {"owner": "mirror", "repo": "busybox", "clone": 1},
     {"owner": "cisco-talos", "repo": "clamav-devel", "clone": 1},
     {"owner": "collectd", "repo": "collectd", "clone": 1},

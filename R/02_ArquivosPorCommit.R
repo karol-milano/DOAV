@@ -32,11 +32,11 @@ gerarArquivosPorCommit <- function(projeto, valores) {
   
   arq_var <- arrange(arq_var, Arquivo)
   
-  tabela <- paste("../graphs/", projeto, "/02_", projeto, "_FilesPerCommit.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/02_", projeto, "_FilesPerCommit.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/02_", projeto, "_FilesPerCommit.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/02_", projeto, "_FilesPerCommit.png", sep = "")
   
   png(file = imagem)
   

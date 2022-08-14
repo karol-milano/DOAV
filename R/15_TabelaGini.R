@@ -4,7 +4,7 @@ source("00_Utils.R")
 
 tabelaGini <- function() {  
   x <- data.frame()
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -14,7 +14,7 @@ tabelaGini <- function() {
   mean_row <- c("Mean", mean(x[,2]), mean(x[,3]), mean(x[,4]))
   x <- rbind(x, mean_row)
   
-  write.table(x, file="15_TabelaGini.csv", sep=",", row.names=F)
+  write.table(x, file="../data/graphs/15_TabelaGini.csv", sep=",", row.names=F)
 }
 
 

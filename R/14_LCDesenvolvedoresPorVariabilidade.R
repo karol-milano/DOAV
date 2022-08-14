@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 lcDesenvolvedoresPorVariabilidade <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -34,11 +34,11 @@ gerarLCDesenvolvedoresPorVariabilidade <- function(projeto, valores) {
   
   arq_var[ , "Total"] = sum(arq_var[ , "Developers"])
   
-  tabela <- paste("../graphs/", projeto, "/14_", projeto, "_LCDevelopersByVariability.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/14_", projeto, "_LCDevelopersByVariability.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/14_", projeto, "_LCDevelopersByVariability.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/14_", projeto, "_LCDevelopersByVariability.png", sep = "")
   
   png(file = imagem)
   

@@ -21,7 +21,11 @@ is_ln = True
 toCsv = True
 
 locale.setlocale(locale.LC_ALL, '')
+
 working_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_dir = os.path.join(working_directory, "data")
+parsed_repositories = os.path.join(data_dir, "parsed_repositories")
+graphs = os.path.join(data_dir, "graphs")
 
 def save_file(out, rows, mode):
     print("Saving file " + out + " ... ")
@@ -69,13 +73,13 @@ def parse_variability_from_file(my_file, data):
 
 def main():
     
-    for root, dirs, files in os.walk(working_directory + '/parsed_repositories'):
+    for root, dirs, files in os.walk(parsed_repositories):
         for f in sorted(files):
             if '.json' in f:
                 try:
-                    with open(working_directory + '/parsed_repositories/' + f) as jfile:
+                    with open(os.path.join(parsed_repositories, f)) as jfile:
 
-                        my_file = f.split('.')[0]
+                        my_file = os.path.splitext(f)[0]
                         print("Loading file " + my_file + " ... ", end='')
                         data = json.load(jfile)[my_file]
                         print("[OK]")
@@ -84,14 +88,14 @@ def main():
                         rows_commit = parse_commit_from_file(my_file, data, rows_author)
                         rows_variability = parse_variability_from_file(my_file, data)
 
-                        newpath = working_directory + '/graphs/' + my_file;
+                        newpath = os.path.join(graphs, my_file)
                         if not os.path.exists(newpath):
                             os.makedirs(newpath)
 
-                        out = newpath + '/' + my_file + '_Authors.csv'
+                        out = os.path.join(newpath, my_file + '_authors.csv')
                         save_file(out, rows_author, 'w+')
 
-                        out = newpath + '/' + my_file + '_Commits.csv'
+                        out = os.path.join(newpath, my_file + '_commits.csv')
                         save_file(out, rows_commit, 'w+')
 
                         if is_ln:
@@ -100,7 +104,7 @@ def main():
                                 r['qtd_commits_dl'] = round(math.log(1 + r['qtd_commits_dl']), 3)
                                 r['qtd_commits_ac'] = round(math.log(1 + r['qtd_commits_ac']), 3)
 
-                        out = newpath + '/' + my_file + '_Variabilities.csv'
+                        out = os.path.join(newpath, my_file + '_variabilities.csv')
                         save_file(out, rows_variability, 'w+')
 
                         print()
@@ -110,4 +114,8 @@ def main():
                     print()
 
 if __name__ == "__main__":
+
+    if not os.path.exists(graphs):
+        os.makedirs(graphs)
+
     main()

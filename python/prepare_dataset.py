@@ -13,7 +13,12 @@ from tqdm import tqdm
 
 
 maxInt = sys.maxsize
-work_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+working_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_dir = os.path.join(working_directory, "data")
+pull_requests = os.path.join(data_dir, "pull_requests")
+graphs = os.path.join(data_dir, "graphs")
+
 
 while True:
     # decrease the maxInt value by factor 10 
@@ -35,46 +40,8 @@ def insertIntoDict (dic, key, val = 1):
         dic[key] = val
 
 
-def unify_dataset():
-    """
-    """
-
-    
-    doa_dir = os.path.join(work_dir, "doa")
-    data_dir = os.path.join(work_dir, "json")
-
-    repos_file = os.path.join(work_dir, "repo.json")
-    out_file = os.path.join(work_dir, "dataset.csv")
-
-    repos = []
-    ready = True
-
-    print("Checking files...")
-    with open(repos_file) as json_file:
-        data = json.load(json_file)
-
-    for repo in sorted(data, key=lambda x : x['repo'].lower()):
-        r = repo["repo"].lower()
-        repos.append(r)
-
-        if not os.path.exists(os.path.join(doa_dir, r + "_commits.csv")):
-            print("File not found: ", os.path.join(doa_dir, r + "_commits.csv"))
-            ready = False
-
-        if not os.path.exists(os.path.join(doa_dir, r + "_authors.csv")):
-            print("File not found: ", os.path.join(doa_dir, r + "_authors.csv"))
-            ready = False
-
-        if not os.path.exists(os.path.join(doa_dir, r + "_variabilities.csv")):
-            print("File not found: ", os.path.join(doa_dir, r + "_variabilities.csv"))
-            ready = False
-
-        if not os.path.exists(os.path.join(data_dir, r + ".json")):
-            print("File not found: ", os.path.join(data_dir, r + ".json"))
-            ready = False
-
-    if not ready:
-        return -1
+def unify_dataset(repos = []):
+    out_file = os.path.join(data_dir, "dataset.csv")
 
     print("Preparing dataset...")
     with open(out_file, "w", encoding="utf-8") as csv_file:
@@ -116,7 +83,8 @@ def unify_dataset():
                 i += 1
 
                 dataset = []
-                in_file = os.path.join(doa_dir, projeto + "_commits.csv")
+                project_graphs = os.path.join(graphs, projeto)
+                in_file = os.path.join(project_graphs, projeto + "_commits.csv")
                 with open(in_file, encoding="utf8", errors="ignore") as csv_file:
                     reader = csv.DictReader(csv_file)
                     reader = sorted(reader, key=operator.itemgetter('desenvolvedor'))
@@ -146,7 +114,7 @@ def unify_dataset():
                             "ownership_variabilidade": 0
                         })
 
-                in_file = os.path.join(doa_dir, projeto + "_authors.csv")
+                in_file = os.path.join(project_graphs, projeto + "_authors.csv")
                 with open(in_file, encoding="utf8", errors="ignore") as csv_file:
                     reader = csv.DictReader(csv_file)
                     reader = sorted(reader, key=operator.itemgetter('desenvolvedor'))
@@ -173,7 +141,7 @@ def unify_dataset():
 
                     print()
 
-                in_file = os.path.join(doa_dir, projeto + "_variabilities.csv")
+                in_file = os.path.join(project_graphs, projeto + "_variabilities.csv")
                 with open(in_file, encoding="utf8", errors="ignore") as csv_file:
                     reader = csv.DictReader(csv_file)
                     reader = sorted(reader, key=operator.itemgetter('desenvolvedor'))
@@ -213,7 +181,7 @@ def unify_dataset():
                     for qtd in value:
                         user_list[dev] += int(value[qtd])
 
-                in_file = os.path.join(data_dir, projeto + ".json")
+                in_file = os.path.join(pull_requests, projeto + ".json")
                 with open(in_file, encoding="utf8", errors="ignore") as json_file:
                     data = json.load(json_file)
 
@@ -334,9 +302,9 @@ def unify_dataset():
 
 def split_train_test():
 
-    in_file = os.path.join(work_dir, "dataset.csv")
-    train_dataset_file = os.path.join(work_dir, "train_dataset.csv")
-    test_dataset_file = os.path.join(work_dir, "test_dataset.csv")
+    in_file = os.path.join(data_dir, "dataset.csv")
+    train_dataset_file = os.path.join(data_dir, "train_dataset.csv")
+    test_dataset_file = os.path.join(data_dir, "test_dataset.csv")
 
     data = pd.read_csv(in_file)
 
@@ -378,5 +346,38 @@ def split_train_test():
     print("[DONE]")
 
 if __name__ == "__main__":
-    unify_dataset()
-    split_train_test()
+    repos_file = os.path.join(working_directory, "repos.json")
+
+    repos = []
+    ready = True
+
+    print("Checking files...")
+    with open(repos_file) as json_file:
+        data = json.load(json_file)
+
+    for repo in sorted(data, key=lambda x : x['repo'].lower()):
+        r = repo["repo"].lower()
+        repos.append(r)
+
+        project_graphs = os.path.join(graphs, r)
+
+        if not os.path.exists(os.path.join(project_graphs, r + "_commits.csv")):
+            print("File not found: ", os.path.join(project_graphs, r + "_commits.csv"))
+            ready = False
+
+        if not os.path.exists(os.path.join(project_graphs, r + "_authors.csv")):
+            print("File not found: ", os.path.join(project_graphs, r + "_authors.csv"))
+            ready = False
+
+        if not os.path.exists(os.path.join(project_graphs, r + "_variabilities.csv")):
+            print("File not found: ", os.path.join(project_graphs, r + "_variabilities.csv"))
+            ready = False
+
+        if not os.path.exists(os.path.join(pull_requests, r + ".json")):
+            print("File not found: ", os.path.join(pull_requests, r + ".json"))
+            ready = False
+
+    if ready:
+        print("DONE")
+        unify_dataset(repos)
+        split_train_test()

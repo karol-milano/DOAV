@@ -3,7 +3,7 @@
 source("00_Utils.R")
 
 variabiliadadesPorDesenvolvedorPeloTempo <- function() {
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaCommits(file.names[i])
@@ -33,11 +33,11 @@ gerarVariabilidadesPorDesenvolvedorPeloTempo <- function(projeto, valores) {
   arq_var['EhAutor'][arq_var['EhAutor'] == "Autor"] <- "Author"
   arq_var['EhAutor'][arq_var['EhAutor'] == "Colaborador"] <- "Collaborator"
   
-  tabela <- paste("../graphs/", projeto, "/09_", projeto, "_VariabilitiesPerDeveloperOverTime.csv", sep = "")
+  tabela <- paste("../data/graphs/", projeto, "/09_", projeto, "_VariabilitiesPerDeveloperOverTime.csv", sep = "")
   
   write.table(arq_var, file=tabela, sep=",", row.names=F)
   
-  imagem <- paste("../graphs/", projeto, "/09_", projeto, "_VariabilitiesPerDeveloperOverTime.png", sep = "")
+  imagem <- paste("../data/graphs/", projeto, "/09_", projeto, "_VariabilitiesPerDeveloperOverTime.png", sep = "")
   
   png(file = imagem)
   

@@ -19,15 +19,17 @@ while True:
     except OverflowError:
         maxInt = int(maxInt/10)
 
+working_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_dir = os.path.join(working_directory, "data")
+
 
 def doav(a, b, c, d, e):
     return 1.44601 + a * 0.36413 + b * -0.00732 + c * -0.32662 + d * 0.63357 + e * -0.00439
 
 def calculate_doav():
-    work_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    data_file = os.path.join(work_dir, "test_dataset.csv")
+    test_dataset = os.path.join(data_dir, "test_dataset.csv")
 
-    with open(data_file) as csv_file:
+    with open(test_dataset) as csv_file:
         reader = csv.DictReader(csv_file)
 
         data = []
@@ -95,27 +97,26 @@ def calculate_doav():
     df_corte_03 = df[df['doav_n'] > 0.2]
 
 
-    out_file = os.path.join(work_dir, "df_corte_01.csv")
+    out_file = os.path.join(data_dir, "df_corte_01.csv")
     print(out_file)
     df_corte_01.to_csv(out_file, index=False)
     print("[DONE]")
 
-    out_file = os.path.join(work_dir, "df_corte_02.csv")
+    out_file = os.path.join(data_dir, "df_corte_02.csv")
     print(out_file)
     df_corte_02.to_csv(out_file, index=False)
     print("[DONE]")
 
-    out_file = os.path.join(work_dir, "df_corte_03.csv")
+    out_file = os.path.join(data_dir, "df_corte_03.csv")
     print(out_file)
     df_corte_03.to_csv(out_file, index=False)
     print("[DONE]")
 
-
-    # out_file = os.path.join(work_dir, "jaccard_seg_43p_1000e_0,00001lr_20t.csv")
-    # with open(out_file, "w", encoding="utf-8") as write_file:
-    #     writer = csv.DictWriter(write_file, fieldnames=jac[0].keys())
-    #     writer.writeheader()
-    #     writer.writerows(jac)
+    out_file = os.path.join(data_dir, "doav.csv")
+    with open(out_file, "w", encoding="utf-8") as write_file:
+        writer = csv.DictWriter(write_file, fieldnames=data[0].keys())
+        writer.writeheader()
+        writer.writerows(data)
 
 
 if __name__ == "__main__":

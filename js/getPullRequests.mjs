@@ -1,5 +1,6 @@
 import { Octokit } from 'octokit';
-import {readFileSync, writeFileSync} from 'fs';
+import { exists, mkdir, readFileSync, writeFileSync } from 'fs';
+
 
 async function fn_err(err, repo, number, str) {
     console.log(str + ": " + repo + " number: " + number);
@@ -117,15 +118,35 @@ let fname = '../repos.json';
 const octokit = new Octokit();
 // const octokit = new Octokit({ auth: `personal-access-tokens` }); // https://docs.github.com/en/rest/guides/getting-started-with-the-rest-api#using-personal-access-tokens
 
+   
+exists('../data/pull_requests/', (exists) => {
+    if (!exists) {
+        mkdir('../data/pull_requests/', (err) => {
+            if (err) {
+                return console.error(err);
+            }
+        });        
+    }
+}); 
+
+
 try {
     const data = readFileSync(fname, 'utf8');
     const repositorios = JSON.parse(data);
 
     let j = 1;
     for (const r of repositorios) {
+        if (r.clone == 0) {
+            continue;
+        }
+
         try {
+            let k = 1;
+            let i = 1;
+            let users = [];
+
             let reviewData = [];
-            let fileName = '../pull_requests/' + r.repo + '.json';
+            let fileName = '../data/pull_requests/' + r.repo + '.json';
 
             console.log(j + " of " + repositorios.length);
             console.log(fileName);
@@ -161,27 +182,6 @@ try {
                 return a.pull_number - b.pull_number;
             }), null, 4));
 
-        } catch (err) {
-            console.log(JSON.stringify(r));
-            console.log(err);
-        }
-    }
-
-    j = 1;
-    for (const r of repositorios) {
-
-        let k = 1;
-        let i = 1;
-        let users = [];
-        let fileName = '../pull_requests/' + r.repo + '.json';
-        let reviewData = JSON.parse(readFileSync(fileName, 'utf8'));
-
-        console.log(j + " of " + repositorios.length);
-        console.log(fileName);
-
-        j += 1;
-
-        try {
             for (const pull of reviewData) {
                 if (pull.downloaded == 0) {
                     let resp = null;

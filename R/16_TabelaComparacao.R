@@ -4,14 +4,14 @@ source("00_Utils.R")
 
 tabelaComparacao <- function() {
   x <- data.frame()
-  path <- "../graphs/"
+  path <- "../data/graphs/"
   file.names <- dir(path)
   for (i in 1:length(file.names)) {
     valores <- lerPlanilhaAutores(file.names[i])
     x <- rbind(x, gerarTabelaComparacao(file.names[i], valores))
   }
   
-  write.table(x, file="16_TabelaComparacao.csv", sep=",", row.names=F)
+  write.table(x, file="../data/graphs/16_TabelaComparacao.csv", sep=",", row.names=F)
 }
 
 

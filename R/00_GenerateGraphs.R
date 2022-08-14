@@ -24,7 +24,7 @@ source("17_DesenvolvedoresPorArquivo.R")
 
 # ======================================================================= #
 
-path <- "../graphs/"
+path <- "../data/graphs/"
 file.names <- dir(path)
 for (i in 1:length(file.names)) {
   projeto <- file.names[i]

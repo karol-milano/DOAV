@@ -248,20 +248,20 @@ def parse_variability(json_data):
 
 
 			if r['variabilidade'] in dict_ownership_r:
-				ownership_rlm = dict_ownership_r.get(r['variabilidade'])
+				ownership_rlm_a = dict_ownership_r.get(r['variabilidade'])
 
-				if r['ownership_rlm'] > ownership_rlm:
-					ownership_rlm = r['ownership_rlm']
+				if r['ownership_rlm'] > ownership_rlm_a:
+					ownership_rlm_a = r['ownership_rlm']
 
-				dict_ownership_r[r['variabilidade']] = ownership_rlm
+				dict_ownership_r[r['variabilidade']] = ownership_rlm_a
 			else:
 				dict_ownership_r[r['variabilidade']] = r['ownership_rlm']
 
 			rows.append(r)
 
 		for r in rows:
-			ownership_rlm = dict_ownership_r.get(r['variabilidade'])
-			r['ownership_rlm_n'] = r['ownership_rlm'] / ownership_rlm
+			ownership_rlm_a = dict_ownership_r.get(r['variabilidade'])
+			r['ownership_rlm_n'] = r['ownership_rlm'] / ownership_rlm_a
 
 			ownership_arquivo = dict_ownership_arquivo.get(r['arquivo'])
 			r['ownership_arquivo_n'] = r['ownership_arquivo'] / ownership_arquivo

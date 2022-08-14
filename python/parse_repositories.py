@@ -9,7 +9,7 @@ import unidecode
 from file import *
 from author import *
 from commit import *
-from variabilidade import *
+from variability import *
 
 from tqdm import tqdm
 from datetime import datetime
@@ -17,15 +17,18 @@ from pydriller import Repository
 from preprocessor import Preprocessor
 
 
-def clone_repositories():
+working_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_dir = os.path.join(working_directory, "data")
+cloned_repos = os.path.join(data_dir, "cloned_repositories")
+repositories = os.path.join(data_dir, "repositories")
+parsed_repositories = os.path.join(data_dir, "parsed_repositories")
 
-    working_directory = os.path.dirname(os.path.realpath(__file__))
-    cloned_repos = os.path.join(working_directory, "cloned_repositories")
-    repositories = os.path.join(working_directory, "repositories")
+
+def clone_repositories():
 
     date_to = datetime(2021, 5, 1, 22, 00, 00)
 
-    with open() as json_file:
+    with open(os.path.join(working_directory, "repos.json")) as json_file:
         json_data = json.load(json_file)
 
         for row in json_data:
@@ -115,10 +118,7 @@ def clone_repositories():
 
 
 def parse_files():
-    repos_dir = os.path.dirname(os.path.realpath(__file__))
-    repos_dir = os.path.join(repos_dir, "repositories")
-
-    files = [f for f in os.listdir(repos_dir) if len(f.split(".")) == 2]
+    files = [f for f in os.listdir(repositories) if len(f.split(".")) == 2]
 
     for file_name in sorted(files):
         name, ext = file_name.split(".")
@@ -128,31 +128,23 @@ def parse_files():
 
 
 def parse_repo(project = "Cherokee"):
-    """
-    """
+    repositories_project_dir = os.path.join(repositories, project)
+    parsed_project_dir = os.path.join(parsed_repositories, project)
 
-    data_dir = os.path.dirname(os.path.realpath(__file__))
-    data_dir = os.path.join(data_dir, "repositories")
-    data_dir = os.path.join(data_dir, project)
-
-    results_dir = os.path.dirname(os.path.realpath(__file__))
-    results_dir = os.path.join(results_dir, "parsed_repositories")
-    project_dir = os.path.join(results_dir, project)
-
-    if not os.path.exists(project_dir):
-        os.makedirs(project_dir)
+    if not os.path.exists(parsed_project_dir):
+        os.makedirs(parsed_project_dir)
 
     arquivos = {}
     autores = {}
     commits = {}
     variabilidades = {}
 
-    with open(data_dir + ".csv") as csv_file:
+    with open(repositories_project_dir + ".csv") as csv_file:
         csv_file.seek(0, 0)
 
         csv_reader = csv.DictReader(csv_file)
 
-        output_var_csv = os.path.join(results_dir, project + ".csv")
+        output_var_csv = os.path.join(parsed_repositories, project + ".csv")
         with open(output_var_csv, "w+") as output_csv:
             header = [
                 "Commit",
@@ -176,8 +168,8 @@ def parse_repo(project = "Cherokee"):
                     author_email = ""
                     date = row['Date'].strip()
 
-                    input_path = os.path.join(data_dir, id_commit)
-                    output_path = os.path.join(project_dir, id_commit)
+                    input_path = os.path.join(repositories_project_dir, id_commit)
+                    output_path = os.path.join(parsed_project_dir, id_commit)
 
                     for root, dirs, files in os.walk(input_path):
                         for file_name in sorted(files):
@@ -254,11 +246,20 @@ def parse_repo(project = "Cherokee"):
     data[project]["Commits"] = commits
     data[project]["Variabilidades"] = variabilidades
 
-    output_json = os.path.join(results_dir, project + ".json")
+    output_json = os.path.join(parsed_repositories, project + ".json")
     with open(output_json, "w+") as json_file:
         json.dump(data, json_file, indent = 4, sort_keys = True)
 
 
 if __name__ == "__main__":
+    if not os.path.exists(cloned_repos):
+        os.makedirs(cloned_repos)
+
+    if not os.path.exists(repositories):
+        os.makedirs(repositories)
+
+    if not os.path.exists(parsed_repositories):
+        os.makedirs(parsed_repositories)
+
     clone_repositories()
     parse_files()
