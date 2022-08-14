@@ -1,0 +1,14 @@
+gitdb
+GitPython
+lizard
+lml
+lxml
+pandas
+PyDriller
+python-dateutil
+python-utils
+pytz
+six
+smmap
+tqdm
+Unidecode
