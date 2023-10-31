@@ -28,9 +28,8 @@ parsed_repositories = os.path.join(data_dir, "parsed_repositories")
 graphs = os.path.join(data_dir, "graphs")
 
 def save_file(out, rows, mode):
-    print("Saving file " + out + " ... ")
+    print("Saving file " + out + " ... ", end="")
 
-    start_time = time.time()
     with open(out, mode) as outfile:
         dict_writer = csv.DictWriter(outfile, rows[0].keys())
         if mode != "a+":
@@ -38,7 +37,7 @@ def save_file(out, rows, mode):
         
         dict_writer.writerows(rows)
         
-    print("Saved in %s seconds" % (time.time() - start_time))
+    print("[OK]")
 
 
 def parse_author_from_file(my_file, data):
@@ -46,7 +45,7 @@ def parse_author_from_file(my_file, data):
     print("Parsing authors from file " + my_file + " ... ")
     start_time = time.time()
     rows_author = parse_author(data)        
-    print("Parsed in %s seconds" % (time.time() - start_time))
+    print("Parsed in %.3f seconds" % (time.time() - start_time))
 
     return rows_author
 
@@ -56,7 +55,7 @@ def parse_commit_from_file(my_file, data, rows_author):
     print("Parsing commits from file " + my_file + " ... ")
     start_time = time.time()
     rows_commit = parse_commit(rows_author, data)
-    print("Parsed in %s seconds" % (time.time() - start_time))
+    print("Parsed in %.3f seconds" % (time.time() - start_time))
 
     return rows_commit
 
@@ -83,20 +82,20 @@ def main():
                         print("Loading file " + my_file + " ... ", end='')
                         data = json.load(jfile)[my_file]
                         print("[OK]")
-
-                        rows_author = parse_author_from_file(my_file, data)
-                        rows_commit = parse_commit_from_file(my_file, data, rows_author)
-                        rows_variability = parse_variability_from_file(my_file, data)
-
+                        
                         newpath = os.path.join(graphs, my_file)
                         if not os.path.exists(newpath):
                             os.makedirs(newpath)
 
-                        out = os.path.join(newpath, my_file + '_authors.csv')
-                        save_file(out, rows_author, 'w+')
-
-                        out = os.path.join(newpath, my_file + '_commits.csv')
-                        save_file(out, rows_commit, 'w+')
+                        rows_author = parse_author_from_file(my_file, data)
+                        authors_file = os.path.join(newpath, my_file + '_authors.csv')
+                        save_file(authors_file, rows_author, 'w+')
+                        
+                        rows_commit = parse_commit_from_file(my_file, data, rows_author)
+                        commits_file = os.path.join(newpath, my_file + '_commits.csv')
+                        save_file(commits_file, rows_commit, 'w+')
+                        
+                        rows_variability = parse_variability_from_file(my_file, data)
 
                         if is_ln:
                             for r in rows_variability:
@@ -104,14 +103,18 @@ def main():
                                 r['qtd_commits_dl'] = round(math.log(1 + r['qtd_commits_dl']), 3)
                                 r['qtd_commits_ac'] = round(math.log(1 + r['qtd_commits_ac']), 3)
 
-                        out = os.path.join(newpath, my_file + '_variabilities.csv')
-                        save_file(out, rows_variability, 'w+')
+                        variability_file = os.path.join(newpath, my_file + '_variabilities.csv')
+                        save_file(variability_file, rows_variability, 'w+')
 
                         print()
                 except ValueError as error:
                     print("[FAIL]")
                     print("Invalid json: %s" % error)
                     print()
+                except Exception as e:
+                    print("[FAIL]")
+                    print(e)
+                    
 
 if __name__ == "__main__":
 

@@ -24,16 +24,18 @@ repositories = os.path.join(data_dir, "repositories")
 parsed_repositories = os.path.join(data_dir, "parsed_repositories")
 
 
+allowed_extensions = [".c", ".cpp", ".h", ".hpp"]
+reserved_names = ["con", "prn", "aux", "nul", "com0", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "lpt0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9"]
+
 def clone_repositories():
 
-    date_to = datetime(2021, 5, 1, 22, 00, 00)
+    # clona até essa data
+    date_to = datetime(2023, 11, 10, 22, 00, 00)
 
     with open(os.path.join(working_directory, "repos.json")) as json_file:
         json_data = json.load(json_file)
 
         for row in json_data:
-            print(row)
-
             project = row['repo'].lower()
             clone = int(row['clone'])
             url = "https://github.com/{}/{}".format(row['owner'], project)
@@ -41,19 +43,21 @@ def clone_repositories():
             if clone == 0:
                 continue
 
-            repo_dir = os.path.join(repositories, project)
+            print("Preparing to clone %s/%s..." % (row['owner'], project))
 
-            print("[%s] Creating csv file..." % project)
+            repo_dir = os.path.join(repositories, project)
 
             with open(repo_dir + ".csv", 'w') as csv_file:
                 dict_writer = csv.DictWriter(csv_file, ["Commit", "Author", "Date", "FileCount"])
                 dict_writer.writeheader()
                 
                 autores = dict()
-                print("[%s] Cloning repository..." % project)
-                t_commits = Repository(url, to=date_to, clone_repo_to=cloned_repos).traverse_commits()
-                print("[%s] Traversing repository..." % project)
-                for commit in t_commits:
+                print("Cloning repository [%s]..." % project, end='')
+                #t_commits = Repository(url, to=date_to, clone_repo_to=cloned_repos).traverse_commits()
+                t_commits = Repository(os.path.join(cloned_repos, project), to=date_to, clone_repo_to=cloned_repos).traverse_commits()
+                print("[DONE]")
+
+                for commit in tqdm(t_commits, "Traversing repository [%s]" % project):
                     try:
                         email = commit.author.email.lower().strip()
                         name = unidecode.unidecode(commit.author.name.title().strip())
@@ -67,8 +71,8 @@ def clone_repositories():
 
                         file_count = 0
                         for modified_file in commit.modified_files:
-                            ext = modified_file.filename.split(".")[-1]
-                            if ext != "c" and ext != "cpp":
+                            filename, ext = os.path.splitext(modified_file.filename)
+                            if ext not in allowed_extensions:
                                 continue
 
                             aux = ""
@@ -82,7 +86,10 @@ def clone_repositories():
                             if not os.path.exists(modified):
                                 os.makedirs(modified)
 
-                            modified = os.path.join(modified, modified_file.filename)
+                            if filename.lower() in reserved_names:
+                                filename += "_"
+
+                            modified = os.path.join(modified, filename + ext)
 
                             with open(modified, 'w') as f:
                                 f.write(modified_file.diff)
@@ -110,10 +117,7 @@ def clone_repositories():
                         if exc is not None:
                             stackstr += '  ' + traceback.format_exc().lstrip(trc)
                         print(stackstr)
-
-                print("[%s] End" % (project))
             
-            print()
             print("="*150)
 
 
@@ -121,9 +125,8 @@ def parse_files():
     files = [f for f in os.listdir(repositories) if len(f.split(".")) == 2]
 
     for file_name in sorted(files):
-        name, ext = file_name.split(".")
-        if ext == "csv":
-            print("\n" + name)
+        name, ext = os.path.splitext(file_name)
+        if ext == ".csv":
             parse_repo(name)
 
 
@@ -160,7 +163,7 @@ def parse_repo(project = "Cherokee"):
             dict_writer = csv.DictWriter(output_csv, header)
             dict_writer.writeheader()
 
-            for row in tqdm(csv_reader, desc="Parsing"):
+            for row in tqdm(csv_reader, "Parsing repository [%s]" % project):
                 if int(row['FileCount']) > 0:
 
                     id_commit = row['Commit'].strip()
@@ -173,8 +176,8 @@ def parse_repo(project = "Cherokee"):
 
                     for root, dirs, files in os.walk(input_path):
                         for file_name in sorted(files):
-                            ext = file_name.split(".")[-1]
-                            if ext != "c" and ext != "h" and ext != "cpp" and ext != "hpp":
+                            ext = os.path.splitext(file_name)[-1]
+                            if ext not in allowed_extensions:
                                 continue
 
                             root_dir = os.path.join(input_path, root)
@@ -187,7 +190,6 @@ def parse_repo(project = "Cherokee"):
                                 os.makedirs(output)
 
                             output_file = os.path.join(output, file_name + ".var")
-
 
                             rd = root.split(id_commit + "/")
                             if len(rd) > 1:
@@ -232,8 +234,6 @@ def parse_repo(project = "Cherokee"):
                                     variabilidades[var] = update_variability(variabilidades[var], id_commit, author_name, author_email, file_name, date, var)
                                 else:
                                     variabilidades[var] = create_variability(id_commit, author_name, author_email, file_name, date, var)
-
-        print()
 
     #################################################################################################
     #### Salva o JSON no arquivo
