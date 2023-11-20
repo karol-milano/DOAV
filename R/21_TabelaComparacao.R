@@ -11,7 +11,7 @@ tabelaComparacao <- function() {
     x <- rbind(x, gerarTabelaComparacao(file.names[i], valores))
   }
   
-  write.table(x, file="../data/16_TabelaComparacao.csv", sep=",", row.names=F)
+  write.table(x, file="../data/21_TabelaComparacao.csv", sep=",", row.names=F)
 }
 
 
@@ -30,12 +30,9 @@ gerarTabelaComparacao <- function(projeto, valores) {
   arq_var <- arq_var[!duplicated(arq_var[, c("Desenvolvedor", "Classificacao", "EhAutor")]), ]
 
   arq_var <- arq_var %>%
-    summarise(Author_Specialist = sum(Classificacao == "Especialista" & EhAutor == "Autor"),
-              Author_Generalist = sum(Classificacao == "Generalista" & EhAutor == "Autor"),
-              Author_Mixed = sum(Classificacao == "Misto" & EhAutor == "Autor"),
-              Collaborator_Specialist = sum(Classificacao == "Especialista" & EhAutor == "Colaborador"),
-              Collaborator_Generalist = sum(Classificacao == "Generalista" & EhAutor == "Colaborador"),
-              Collaborator_Mixed = sum(Classificacao == "Misto" & EhAutor == "Colaborador")) %>%
+    summarise(Specialist = sum(Classificacao == "Especialista"),
+              Generalist = sum(Classificacao == "Generalista"),
+              Mixed = sum(Classificacao == "Misto")) %>%
     mutate(Project = projeto)
   
   arq_var <- arq_var %>%

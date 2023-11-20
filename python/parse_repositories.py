@@ -22,112 +22,110 @@ data_dir = os.path.join(working_directory, "data")
 cloned_repos = os.path.join(data_dir, "cloned_repositories")
 repositories = os.path.join(data_dir, "repositories")
 parsed_repositories = os.path.join(data_dir, "parsed_repositories")
-
+repos_file = os.path.join(working_directory, "repos.json")
 
 allowed_extensions = [".c", ".cpp", ".h", ".hpp"]
 reserved_names = ["con", "prn", "aux", "nul", "com0", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "lpt0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9"]
 
-def clone_repositories():
+def clone_repositories(json_data):
 
     # clona até essa data
     date_to = datetime(2023, 11, 10, 22, 00, 00)
 
-    with open(os.path.join(working_directory, "repos.json")) as json_file:
-        json_data = json.load(json_file)
+    for row in json_data:
+        project = row['repo'].lower()
+        clone = int(row['clone'])
 
-        for row in json_data:
-            project = row['repo'].lower()
-            clone = int(row['clone'])
-            url = "https://github.com/{}/{}".format(row['owner'], project)
+        if clone == 0:
+            continue
 
-            if clone == 0:
-                continue
+        url = "https://github.com/{}/{}".format(row['owner'], project)
+        repo_dir = os.path.join(repositories, project)
 
-            print("Preparing to clone %s/%s..." % (row['owner'], project))
+        if clone == 2: # local repository
+            url = os.path.join(cloned_repos, project)
 
-            repo_dir = os.path.join(repositories, project)
+        print("Preparing to clone %s/%s..." % (row['owner'], project))            
 
-            with open(repo_dir + ".csv", 'w') as csv_file:
-                dict_writer = csv.DictWriter(csv_file, ["Commit", "Author", "Date", "FileCount"])
-                dict_writer.writeheader()
-                
-                autores = dict()
-                print("Cloning repository [%s]..." % project, end='')
-                #t_commits = Repository(url, to=date_to, clone_repo_to=cloned_repos).traverse_commits()
-                t_commits = Repository(os.path.join(cloned_repos, project), to=date_to, clone_repo_to=cloned_repos).traverse_commits()
-                print("[DONE]")
-
-                for commit in tqdm(t_commits, "Traversing repository [%s]" % project):
-                    try:
-                        email = commit.author.email.lower().strip()
-                        name = unidecode.unidecode(commit.author.name.title().strip())
-
-                        if email not in autores:
-                            autores[email] = name
-                        else:
-                            name = autores[email]
-
-                        path = os.path.join(repo_dir, commit.hash)
-
-                        file_count = 0
-                        for modified_file in commit.modified_files:
-                            filename, ext = os.path.splitext(modified_file.filename)
-                            if ext not in allowed_extensions:
-                                continue
-
-                            aux = ""
-                            file_count += 1
-                            if modified_file.new_path is not None: # Arquivo não existia
-                                aux = modified_file.new_path.split("/")
-                            elif modified_file.old_path is not None: # Arquivo foi removido
-                                aux = modified_file.old_path.split("/")
-
-                            modified = os.path.join(path, "/".join(aux[1:-1]))
-                            if not os.path.exists(modified):
-                                os.makedirs(modified)
-
-                            if filename.lower() in reserved_names:
-                                filename += "_"
-
-                            modified = os.path.join(modified, filename + ext)
-
-                            with open(modified, 'w') as f:
-                                f.write(modified_file.diff)
-
-                        dict_writer.writerow({
-                            "Commit": commit.hash,
-                            "Author": name,
-                            "Date": commit.author_date,
-                            "FileCount": file_count
-                        })
-
-                    except:
-                        print("Exception")
-                        print(commit.hash)
-                        print(commit.author_date)
-                        print("="*150)
-                        import traceback, sys
-                        exc = sys.exc_info()[0]
-                        stack = traceback.extract_stack()[:-1]  # last one would be full_stack()
-                        if exc is not None:  # i.e. an exception is present
-                            del stack[-1]       # remove call of full_stack, the printed exception
-                                                # will contain the caught exception caller instead
-                        trc = 'Traceback (most recent call last):\n'
-                        stackstr = trc + ''.join(traceback.format_list(stack))
-                        if exc is not None:
-                            stackstr += '  ' + traceback.format_exc().lstrip(trc)
-                        print(stackstr)
+        with open(repo_dir + ".csv", 'w') as csv_file:
+            dict_writer = csv.DictWriter(csv_file, ["Commit", "Author", "Date", "FileCount"])
+            dict_writer.writeheader()
             
-            print("="*150)
+            autores = dict()
+            print("Cloning repository [%s]..." % project, end='')
+            t_commits = Repository(url, to=date_to, clone_repo_to=cloned_repos).traverse_commits()
+            print("[DONE]")
+
+            for commit in tqdm(t_commits, "Traversing repository [%s]" % project):
+                try:
+                    email = commit.author.email.lower().strip()
+                    name = unidecode.unidecode(commit.author.name.title().strip())
+
+                    if email not in autores:
+                        autores[email] = name
+                    else:
+                        name = autores[email]
+
+                    path = os.path.join(repo_dir, commit.hash)
+
+                    file_count = 0
+                    for modified_file in commit.modified_files:
+                        filename, ext = os.path.splitext(modified_file.filename)
+                        if ext not in allowed_extensions:
+                            continue
+
+                        aux = ""
+                        file_count += 1
+                        if modified_file.new_path is not None: # Arquivo não existia
+                            aux = modified_file.new_path.split("/")
+                        elif modified_file.old_path is not None: # Arquivo foi removido
+                            aux = modified_file.old_path.split("/")
+
+                        modified = os.path.join(path, "/".join(aux[1:-1]))
+                        if not os.path.exists(modified):
+                            os.makedirs(modified)
+
+                        if filename.lower() in reserved_names:
+                            filename += "_"
+
+                        modified = os.path.join(modified, filename + ext)
+
+                        with open(modified, 'w') as f:
+                            f.write(modified_file.diff)
+
+                    dict_writer.writerow({
+                        "Commit": commit.hash,
+                        "Author": name,
+                        "Date": commit.author_date,
+                        "FileCount": file_count
+                    })
+
+                except:
+                    print("Exception")
+                    print(commit.hash)
+                    print(commit.author_date)
+                    print("="*150)
+                    import traceback, sys
+                    exc = sys.exc_info()[0]
+                    stack = traceback.extract_stack()[:-1]  # last one would be full_stack()
+                    if exc is not None:  # i.e. an exception is present
+                        del stack[-1]       # remove call of full_stack, the printed exception
+                                            # will contain the caught exception caller instead
+                    trc = 'Traceback (most recent call last):\n'
+                    stackstr = trc + ''.join(traceback.format_list(stack))
+                    if exc is not None:
+                        stackstr += '  ' + traceback.format_exc().lstrip(trc)
+                    print(stackstr)
+        
+        print("="*150)
 
 
-def parse_files():
-    files = [f for f in os.listdir(repositories) if len(f.split(".")) == 2]
+def parse_files(json_data):
+    repos = [f["repo"].lower() for f in json_data if f["parse"] == 1]
 
-    for file_name in sorted(files):
-        name, ext = os.path.splitext(file_name)
-        if ext == ".csv":
-            parse_repo(name)
+    for repo in sorted(repos):
+        if os.path.exists(os.path.join(repositories, repo + ".csv")):
+            parse_repo(repo)
 
 
 def parse_repo(project = "Cherokee"):
@@ -261,5 +259,8 @@ if __name__ == "__main__":
     if not os.path.exists(parsed_repositories):
         os.makedirs(parsed_repositories)
 
-    clone_repositories()
-    parse_files()
+    with open(repos_file) as json_file:
+        json_data = json.load(json_file)
+
+    clone_repositories(json_data)
+    parse_files(json_data)

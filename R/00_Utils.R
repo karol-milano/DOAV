@@ -102,3 +102,21 @@ lerPlanilhaVariabilidades <- function(projeto) {
   
   return (valores)
 }
+
+lerPlanilhaContagem <-function()
+{
+  arquivo <- paste("Contagem.csv", sep = "")
+  
+  print(paste("Lendo arquivo", arquivo))
+  valores <- read.csv(arquivo)
+  dimnames(valores)[[2]] <- c(
+    "Projeto",
+    "Arquivo_n",
+    "Desenvolvedor_n",
+    "Commit_n",
+    "Variabilidades_n",
+    "Data_extracao")
+  
+  return (valores)
+}
+
