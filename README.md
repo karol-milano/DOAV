@@ -8,7 +8,7 @@ This project was developed mainly with Python3, but it uses R to generate graphs
 
 ### Javascript
 
-To get the pull requests, [https://nodejs.org/en/download/](Node.js) is necessary. With it installed, install the requirements by doing:
+To get the pull requests, [Node.js](https://nodejs.org/en/download/) is necessary. With it installed, install the requirements by doing:
 ```
 cd js/
 npm install
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ### R
 
-To generate the graphs, it is necessary to install [https://www.r-project.org](R) and, optionally, [https://www.rstudio.com/products/rstudio/](RStudio). Then you can install the requirements:
+To generate the graphs, it is necessary to install [R](https://www.r-project.org) and, optionally, [RStudio](https://www.rstudio.com/products/rstudio/). Then you can install the requirements:
 ```
 install.packages("ineq")
 install.packages("dplyr")
